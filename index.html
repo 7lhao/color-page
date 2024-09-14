@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <title>Color Tools</title>
+    <script src="./tailwindcss.min.js"></script>
+    <script src="./vue.global.min.js"></script>
+  </head>
+  <body>
+    <main
+      id="root"
+      class="w-screen h-screen bg-gray-200 overflow-x-hidden overflow-y-auto"
+    >
+      <div
+        v-for="(item, idx) in data"
+        :key="idx"
+        class="w-[calc(100vw-30px)] mx-auto mt-4 bg-white rounded-md p-4"
+      >
+        <div
+          :style="{backgroundColor: v}"
+          v-for="v in item"
+          :key="v"
+          class="w-full h-10 leading-10 text-white text-center mb-3 shadow rounded-md"
+          sty
+        >
+          {{v}}
+        </div>
+      </div>
+    </main>
+  </body>
+  <script type="text/javascript">
+    const colors = [
+      "#0099CC",
+      "#FF6666",
+      "#996699",
+      "#CC3333",
+      "#003366",
+      "#003300",
+      "#99CC00",
+      "#000000",
+    ];
+    function gradientColor(startColor, endColor, step) {
+      startRGB = colorRgb(startColor);
+      startR = startRGB[0];
+      startG = startRGB[1];
+      startB = startRGB[2];
+      endRGB = colorRgb(endColor);
+      endR = endRGB[0];
+      endG = endRGB[1];
+      endB = endRGB[2];
+      sR = (endR - startR) / step;
+      sG = (endG - startG) / step;
+      sB = (endB - startB) / step;
+      var colorArr = [];
+      for (var i = 0; i < step; i++) {
+        var hex = colorHex(
+          "rgb(" +
+            parseInt(sR * i + startR) +
+            "," +
+            parseInt(sG * i + startG) +
+            "," +
+            parseInt(sB * i + startB) +
+            ")"
+        );
+        colorArr.push(hex);
+      }
+      return colorArr;
+    }
+    function colorRgb(sColor) {
+      var reg = /^#([0-9a-fA-f]{3}|[0-9a-fA-f]{6})$/;
+      var sColor = sColor.toLowerCase();
+      if (sColor && reg.test(sColor)) {
+        if (sColor.length === 4) {
+          var sColorNew = "#";
+          for (var i = 1; i < 4; i += 1) {
+            sColorNew += sColor.slice(i, i + 1).concat(sColor.slice(i, i + 1));
+          }
+          sColor = sColorNew;
+        }
+        var sColorChange = [];
+        for (var i = 1; i < 7; i += 2) {
+          sColorChange.push(parseInt("0x" + sColor.slice(i, i + 2)));
+        }
+        return sColorChange;
+      } else {
+        return sColor;
+      }
+    }
+    function colorHex(rgb) {
+      var _this = rgb;
+      var reg = /^#([0-9a-fA-f]{3}|[0-9a-fA-f]{6})$/;
+      if (/^(rgb|RGB)/.test(_this)) {
+        var aColor = _this
+          .replace(/(?:(|)|rgb|RGB)*/g, "")
+          .replace("(", "")
+          .replace(")", "")
+          .split(",");
+        var strHex = "#";
+        for (var i = 0; i < aColor.length; i++) {
+          var hex = Number(aColor[i]).toString(16);
+          hex = hex < 10 ? 0 + "" + hex : hex;
+          if (hex === "0") {
+            hex += hex;
+          }
+          strHex += hex;
+        }
+        if (strHex.length !== 7) {
+          strHex = _this;
+        }
+        return strHex;
+      } else if (reg.test(_this)) {
+        var aNum = _this.replace(/#/, "").split("");
+        if (aNum.length === 6) {
+          return _this;
+        } else if (aNum.length === 3) {
+          var numHex = "#";
+          for (var i = 0; i < aNum.length; i += 1) {
+            numHex += aNum[i] + aNum[i];
+          }
+          return numHex;
+        }
+      } else {
+        return _this;
+      }
+    }
+    const { createApp } = Vue;
+    const app = createApp({
+      setup() {
+        const data = colors.map((item) => {
+          return gradientColor(item, "#ffffff", 10);
+        });
+        console.log(data);
+
+        return {
+          data,
+        };
+      },
+    });
+    app.mount("#root");
+  </script>
+</html>
